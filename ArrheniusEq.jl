@@ -12,18 +12,17 @@
 # ---
 
 # + id="OSOaG-m77vLy"
-function arrhenius_rate(A, Ea, T)
-    k = A * exp(-Ea / (8.314 * T))  # R = 8.314 J/(mol*K)
+function arrhenius_rate(A, Ea, G, T)
+    k = A * exp(-Ea / (8.314 * T)) * exp(-G / (8.314 * T))  # R = 8.314 J/(mol*K)
     return k
 end
 
-function arrhenius_transform_with_deposition(existing_layers, new_layer, A_values, Ea_values, T)
-    new_layers = []
-
+function arrhenius_transform_with_deposition(existing_layers, new_layer, A_values, Ea_values,G_values, T)
     # Transform based on Arrhenius equation
+    new_layers = []
     for existing_layer in existing_layers
         # Calculate transformation rates for existing layer
-        k_values = [arrhenius_rate(A, Ea, T) for (A, Ea) in zip(A_values, Ea_values)]
+        k_values = [arrhenius_rate(A, Ea, G, T) for (A, Ea, G) in zip(A_values, Ea_values, G_values)]
 
         # Transform existing layer
         transformed_layer = similar(existing_layer)
