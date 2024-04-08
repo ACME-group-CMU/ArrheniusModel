@@ -46,25 +46,11 @@ function arrhenius_rate(Ea, T)
 end
 
 function arrhenius_rate_matrix(Ea_m, T)
-    k_matrix = [arrhenius_rate(Ea_m[i, j], T) for i in 1:size(Ea_m, 1), j in 1:size(Ea_m, 2)]
+    k_matrix = arrhenius_rate.(Ea_m, T)
     k = copy(k_matrix)
     # Adjust the diagonal elements
     for i in 1:size(k_matrix, 1)
-        for j in 1:size(k_matrix, 2)
-            if i == j
-                k_matrix[i, i] =  -1 * sum(k[i, [1:i-1; i+1:end]])
-            end
-        end
+        k_matrix[i, i] =  -1 * sum(k[i, [1:i-1; i+1:end]])
     end
     return k_matrix
 end
-
-"""
-function arrhenius_transform_with_deposition(existing_layers, new_layer, k_m) #in the time step of dt
-    # Transform existing layers
-    transformed_layers = existing_layers * k_m
-    transformed_layers = vcat(transformed_layers, reshape(new_layer, 1, :))
-
-    return transformed_layers
-end
-"""
