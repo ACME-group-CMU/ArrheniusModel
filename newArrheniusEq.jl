@@ -26,15 +26,15 @@ function flow_coefficient(type, effecting_layers, decay_constant)
 end
 """
 
-function flow_coefficient(type, effecting_nums, decay_coefficient)
-    # effecting_nums: it approaches zero and stop decreasing as the number of effecting layers increases to a certain point, 
-    #                 so I manually set this to limit the number of effecting layers
-    flow_coefficients = []
-    for i in 1:effecting_nums
-        if type == "exponential"
-            push!(flow_coefficients, exp(-decay_coefficient * i))
-        elseif type == "linear"
-            push!(flow_coefficients, (1 - decay_coefficient * i))
+function flow_coefficient(type, effecting_nums, decay_coefficients)
+    flow_coefficients = [Float64[] for _ in 1:length(decay_coefficients)]
+    for i in 1:length(decay_coefficients)
+        for j in 1:effecting_nums
+            if type == "exponential"
+                push!(flow_coefficients[i], exp(-decay_coefficients[i] * j))
+            elseif type == "linear"
+                push!(flow_coefficients[i], (1 - decay_coefficients[i] * j))
+            end
         end
     end
     return flow_coefficients
