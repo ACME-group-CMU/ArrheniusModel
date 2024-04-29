@@ -15,29 +15,25 @@
 #include("Energies.jl")
 
 kb = 8.617e-5 #eV/K
-"""
-function flow_coefficient(type, effecting_layers, decay_constant)
-    A = 1.0
-    if type == "exponential"
-        return A * exp(-decay_constant * coveringlayers)
-    elseif type == "linear"
-        return A * (1 - decay_constant * coveringlayers)
-    end
-end
-"""
 
-function flow_coefficient(type, effecting_nums, decay_coefficients)
-    flow_coefficients = [Float64[] for _ in 1:length(decay_coefficients)]
-    for i in 1:length(decay_coefficients)
-        for j in 1:effecting_nums
-            if type == "exponential"
-                push!(flow_coefficients[i], exp(-decay_coefficients[i] * j))
-            elseif type == "linear"
-                push!(flow_coefficients[i], (1 - decay_coefficients[i] * j))
-            end
+function flow_coefficient(type, effecting_nums, decay_coefficient)
+"""
+Inputs:
+    type: type of decay (exponential or linear)
+    effecting_nums: number of effecting layers on top of the current layer
+Output:
+    flow_coefficients: array of flow coefficients for each layers
+"""
+    effecting_nums = round(Int, effecting_nums)
+    fcoeff = zeros(effecting_nums)
+    for j in 1:effecting_nums
+        if type == "exponential"
+            fcoeff[j] = exp(-decay_coefficient * j)
+        elseif type == "linear"
+            fcoeff[j] = (1 - decay_coefficient * j)
         end
     end
-    return flow_coefficients
+    return fcoeff
 end
 
 function arrhenius_rate(Ea, T)
