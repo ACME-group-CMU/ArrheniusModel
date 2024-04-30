@@ -36,17 +36,14 @@ Output:
     return fcoeff
 end
 
-function arrhenius_rate(Ea, T)
-    k = exp(-Ea / (kb* T))
-    return k
-end
-
-function arrhenius_rate_matrix(Ea_m, T)
-    k_matrix = arrhenius_rate.(Ea_m, T)
-    k = copy(k_matrix)
+function arrhenius_rate(pe::PhaseEnergies, T=300)
+    kb = 8.617e-5 #eV/K
+    A = 1.0 # Arrhenius prefactor
+    k_matrix = A * exp.(-pe.Ea_plus_ΔG ./ (kb * T))
+    k_matrix = Array(k_matrix)
     # Adjust the diagonal elements
     for i in 1:size(k_matrix, 1)
-        k_matrix[i, i] =  -1 * sum(k[i, [1:i-1; i+1:end]])
+        k_matrix[i, i] =  -1 * sum(k_matrix[i, [1:i-1; i+1:end]])
     end
-    return k_matrix
+    return SMatrix{size(k_matrix,1), size(k_matrix,2)}(k_matrix)
 end
