@@ -1,8 +1,9 @@
 module ArrheniusModel
 
 include("EnergyStruct.jl")
+include("newArrheniusEq.jl")
+include("Energies.jl")
 include("Simulation.jl")
-# TODO: add the rest of them
 
 export PhaseEnergies, n_phases
 export simulate_deposition, most_preferable_state
