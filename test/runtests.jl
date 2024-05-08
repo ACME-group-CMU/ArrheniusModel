@@ -13,7 +13,7 @@ using Test
         @test_throws AssertionError PhaseEnergies([0,0,0],Ea)
     end
 
-    @testset "this will fail" begin
-        @test 1==2
+    @testset "this will not fail" begin
+        @test 1==1
     end
 end
