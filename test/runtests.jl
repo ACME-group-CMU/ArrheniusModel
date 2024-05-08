@@ -12,4 +12,8 @@ using Test
         @test n_phases(pe)==2
         @test_throws AssertionError PhaseEnergies([0,0,0],Ea)
     end
+
+    @testset "this will fail" begin
+        @test 1==2
+    end
 end

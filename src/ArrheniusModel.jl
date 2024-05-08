@@ -1,7 +1,7 @@
 module ArrheniusModel
 
 include("EnergyStruct.jl")
-include("simulation.jl")
+include("Simulation.jl")
 # TODO: add the rest of them
 
 export PhaseEnergies, n_phases
