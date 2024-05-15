@@ -35,6 +35,7 @@ using Test
             @test phase == "A+B+C"
             phase = most_preferable_state(layers, 0.3, ["A", "B", "C"])
             @test phase == "A"
+        end
     end
     @testset "Low K Test" begin
         G = [-5.92, -5.942, -5.97]
@@ -51,6 +52,9 @@ using Test
         @test all(layers .>= 0)
         @test all(layers[1,:] .== [1.0, 0.0, 0.0])
         @test all(layers[:, 1] .== 1.0)
+        for i in 1:size(pe.K,1)
+            @test pe.K[i, i] ==  -1 * sum(pe.K[i, [1:i-1; i+1:end]])
+        end
     end
     @testset "this will not fail" begin
         @test 1==1
