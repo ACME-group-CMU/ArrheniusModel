@@ -31,9 +31,27 @@ using Test
             @test size(layers) == (num_steps+1, 3)
             @test all(layers .>= 0)
             @test all(layers[1,:] .== [1.0, 0.0, 0.0])
-        end 
+            phase = most_preferable_state(layers, 0.01, ["A", "B", "C"])
+            @test phase == "A+B+C"
+            phase = most_preferable_state(layers, 0.3, ["A", "B", "C"])
+            @test phase == "A"
     end
-
+    @testset "Low K Test" begin
+        G = [-5.92, -5.942, -5.97]
+        Ea = [0.00 1.00 0.01; 1.00 0.00 1.00; 0.01 1.00 0.00]
+        pe = PhaseEnergies(G, Ea)
+        T = 1.0
+        num_steps = 10
+        dt = 0.1
+        flow_rate = 0.5
+        decay_coefficient = 0.00001 * flow_rate
+        fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
+        layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+        @test size(layers) == (num_steps+1, 3)
+        @test all(layers .>= 0)
+        @test all(layers[1,:] .== [1.0, 0.0, 0.0])
+        @test all(layers[:, 1] .== 1.0)
+    end
     @testset "this will not fail" begin
         @test 1==1
     end
