@@ -48,6 +48,7 @@ using Test
         decay_coefficient = 0.00001 * flow_rate
         fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
         layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+        @test layers[:, 2] != layers[:, 3]
         @test size(layers) == (num_steps+1, 3)
         @test all(layers .>= 0)
         @test all(layers[1,:] .== [1.0, 0.0, 0.0])
