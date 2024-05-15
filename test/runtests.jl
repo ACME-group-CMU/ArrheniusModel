@@ -7,10 +7,31 @@ using Test
     # here's an example, feel free to add to/change it
     @testset "PhaseEnergies struct" begin
         G = [0.0,0.0]
-        Ea = [0.1 0.2; 0.3 0.4]
+        Ea = [0. 0.2; 0.2 0.]
         pe = PhaseEnergies(G, Ea)
-        @test n_phases(pe)==2
+        @test n_phases(pe) == 2
+        @test pe.Ea_plus_ΔG == [0.0 0.2; 0.2 0.0]
         @test_throws AssertionError PhaseEnergies([0,0,0],Ea)
+    end
+    @testset "Homogeneous 3" begin
+        G = [0.0,0.0,0.0]
+        Ea = [0. 0. 0.; 0. 0. 0.; 0. 0. 0.]
+        pe = PhaseEnergies(G, Ea)
+        @test n_phases(pe) == 3
+        @test all(pe.Ea_plus_ΔG .== 0)
+        @testset "300K simulation" begin
+            T = 300.0
+            num_steps = 10
+            dt = 0.1
+            flow_rate = 0.5
+            decay_coefficient = 0.00001 * flow_rate
+            fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
+            layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+            @test layers[:, 2] == layers[:, 3]
+            @test size(layers) == (num_steps+1, 3)
+            @test all(layers .>= 0)
+            @test all(layers[1,:] .== [1.0, 0.0, 0.0])
+        end 
     end
 
     @testset "this will not fail" begin

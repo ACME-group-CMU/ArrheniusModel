@@ -17,8 +17,9 @@ Output:
 """
     # Initialize existing_layers as a 2D array
     n = n_phases(pe)
-    existing_layers = [1.0 0.0 0.0 0.0 0.0 0.0]
-    new_layer = [1.0 0.0 0.0 0.0 0.0 0.0]
+    new_layer = zeros(1, n)
+    new_layer[1] = 1.0
+    existing_layers = new_layer
     gprob = 1.0 
     #compositions = [] # Initialize compositions for each temperature
     A = 0.1 # Arrhenius prefactor
