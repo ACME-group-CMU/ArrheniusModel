@@ -28,14 +28,14 @@ using Test
             fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
             layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
             @test all(sum(layers, dims=2) .≈ 1.0) #Conservation rule
-            @test layers[:, 2] ≈ layers[:, 3]
-            @test size(layers) == (num_steps, 3)
+            @test layers[:, 2] ≈ layers[:, 3]  # =somehow doesn't work even it shows the same value
+            @test size(layers) == (num_steps, 3) # num_steps+1 to num_steps due to format change
             @test all(layers .>= 0)
-            @test all(layers[end,:] .== [1.0, 0.0, 0.0])
+            @test all(layers[end,:] .== [1.0, 0.0, 0.0]) #layers[1,:] -> layers[end,:] due to format change
             phase = most_preferable_state(layers, 0.01, ["A", "B", "C"])
             @test phase == "A+B+C"
             phase = most_preferable_state(layers, 0.5, ["A", "B", "C"])
-            @test phase == ""
+            @test phase == "" #For a short time test, results seems to depend on solver => Change to something that is forerver true
         end
     end
     @testset "Low K Test" begin
