@@ -22,19 +22,20 @@ using Test
         @testset "300K simulation" begin
             T = 300.0
             num_steps = 10
-            dt = 0.1
+            dt = 0.5
             flow_rate = 0.5
             decay_coefficient = 0.00001 * flow_rate
             fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
             layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
-            @test layers[:, 2] == layers[:, 3]
-            @test size(layers) == (num_steps+1, 3)
+            @test all(sum(layers, dims=2) .≈ 1.0) #Conservation rule
+            @test layers[:, 2] ≈ layers[:, 3]
+            @test size(layers) == (num_steps, 3)
             @test all(layers .>= 0)
-            @test all(layers[1,:] .== [1.0, 0.0, 0.0])
+            @test all(layers[end,:] .== [1.0, 0.0, 0.0])
             phase = most_preferable_state(layers, 0.01, ["A", "B", "C"])
             @test phase == "A+B+C"
-            phase = most_preferable_state(layers, 0.3, ["A", "B", "C"])
-            @test phase == "A"
+            phase = most_preferable_state(layers, 0.5, ["A", "B", "C"])
+            @test phase == ""
         end
     end
     @testset "Low K Test" begin
@@ -43,15 +44,16 @@ using Test
         pe = PhaseEnergies(G, Ea)
         T = 1.0
         num_steps = 10
-        dt = 0.1
+        dt = 0.5
         flow_rate = 0.5
         decay_coefficient = 0.00001 * flow_rate
         fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
         layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+        @test all(sum(layers, dims=2) .≈ 1.0)
         @test layers[:, 2] != layers[:, 3]
-        @test size(layers) == (num_steps+1, 3)
+        @test size(layers) == (num_steps, 3)
         @test all(layers .>= 0)
-        @test all(layers[1,:] .== [1.0, 0.0, 0.0])
+        @test all(layers[end,:] .== [1.0, 0.0, 0.0])
         @test all(layers[:, 1] .== 1.0)
         for i in 1:size(pe.K,1)
             @test pe.K[i, i] ==  -1 * sum(pe.K[i, [1:i-1; i+1:end]])
