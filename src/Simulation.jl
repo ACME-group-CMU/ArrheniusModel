@@ -31,7 +31,7 @@ function simulate_deposition(fcoeff, pe::PhaseEnergies, T, num_steps, dt)
     p = (fcoeff, pe, j0, j, dt, num_steps)
     tspan = (0.0, (num_steps-1) * dt)
     prob = ODEProblem(deposition_rates!, c0, tspan, p)
-    sol = solve(prob, Euler(), saveat = 0.5, dt=0.25)
+    sol = solve(prob, Euler(), saveat = 0.5, dt=0.1)
 
     return sol.u[end]
 end
