@@ -33,7 +33,7 @@ Output:
             fcoeff[j] = (1 - decay_coefficient * j)
         end
     end
-    return fcoeff
+    return vcat(zeros(effecting_nums-1), fcoeff) #Add 0s for reverse
 end
 
 function arrhenius_rate(pe::PhaseEnergies, T=300)
