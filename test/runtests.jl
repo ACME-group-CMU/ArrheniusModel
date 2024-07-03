@@ -21,15 +21,17 @@ using Test
         @test all(pe.Ea_plus_ΔG .== 0)
         @testset "300K simulation" begin
             T = 300.0
-            num_steps = 10
-            dt = 0.5
+            t= 10
+            dt = 0.1
+            num_steps = floor(Int, t/dt)
+            num_layers = floor(Int, t/0.5)+1
             flow_rate = 0.5
             decay_coefficient = 0.00001 * flow_rate
-            fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
-            layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+            fcoeff = flow_coefficient("exponential", num_layers, decay_coefficient)
+            layers = simulate_deposition(fcoeff, pe, T, num_steps, num_layers, dt)
             @test all(sum(layers, dims=2) .≈ 1.0) #Conservation rule
             @test layers[:, 2] ≈ layers[:, 3]  # =somehow doesn't work even it shows the same value
-            @test size(layers) == (num_steps, 3) # num_steps+1 to num_steps due to format change
+            @test size(layers) == (num_layers, 3) # num_steps+1 to num_steps due to format change
             @test all(layers .>= 0)
             @test all(layers[end,:] .== [1.0, 0.0, 0.0]) #layers[1,:] -> layers[end,:] due to format change
             phase = most_preferable_state(layers, 0.01, ["A", "B", "C"])
@@ -43,15 +45,17 @@ using Test
         Ea = [0.00 1.00 0.01; 1.00 0.00 1.00; 0.01 1.00 0.00]
         pe = PhaseEnergies(G, Ea)
         T = 1.0
-        num_steps = 10
-        dt = 0.5
+        t= 10
+        dt = 0.1
+        num_steps = floor(Int, t/dt)
+        num_layers = floor(Int, t/0.5)+1
         flow_rate = 0.5
         decay_coefficient = 0.00001 * flow_rate
-        fcoeff = flow_coefficient("exponential", num_steps, decay_coefficient)
-        layers = simulate_deposition(fcoeff, pe, T, num_steps, dt)
+        fcoeff = flow_coefficient("exponential", num_layers, decay_coefficient)
+        layers = simulate_deposition(fcoeff, pe, T, num_steps, num_layers, dt)
         @test all(sum(layers, dims=2) .≈ 1.0)
         @test layers[:, 2] != layers[:, 3]
-        @test size(layers) == (num_steps, 3)
+        @test size(layers) == (num_layers, 3)
         @test all(layers .>= 0)
         @test all(layers[end,:] .== [1.0, 0.0, 0.0])
         @test all(layers[:, 1] .== 1.0)
