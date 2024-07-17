@@ -14,7 +14,12 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Surrogates = "6fc51010-71bc-11e9-0e15-a3fcc6593c49"
 
 [compat]
+DataFrames = "1"
+DifferentialEquations = "7"
 Optim = "1"
+Plots = "1"
+StaticArrays = "1"
+Statistics = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
