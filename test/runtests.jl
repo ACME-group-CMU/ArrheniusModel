@@ -2,15 +2,12 @@ using ArrheniusModel
 using Test
 
 @testset "ArrheniusModel.jl" begin
-    # Write your tests here.
-    # divide tests up into multiple subsets, @testset's can be nested
-    # here's an example, feel free to add to/change it
     @testset "PhaseEnergies struct" begin
         G = [0.0,0.0]
         Ea = [0. 0.2; 0.2 0.]
         pe = PhaseEnergies(G, Ea)
         @test n_phases(pe) == 2
-        @test pe.Ea_plus_ΔG == [0.0 0.2; 0.2 0.0]
+        @test pe.barriers == [0.0 0.2; 0.2 0.0]
         @test_throws AssertionError PhaseEnergies([0,0,0],Ea)
     end
     @testset "Homogeneous 3" begin
@@ -18,7 +15,7 @@ using Test
         Ea = [0. 0. 0.; 0. 0. 0.; 0. 0. 0.]
         pe = PhaseEnergies(G, Ea)
         @test n_phases(pe) == 3
-        @test all(pe.Ea_plus_ΔG .== 0)
+        @test all(pe.barriers .== 0)
         @testset "300K simulation" begin
             T = 300.0
             t= 10
