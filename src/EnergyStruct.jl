@@ -1,20 +1,18 @@
 using StaticArrays
-
-mutable struct PhaseEnergies{N,T}
-    G::SVector{N,T}
-    Ea::SMatrix{N,N,T}
-    ΔG::SMatrix{N,N,T}
-    Ea_plus_ΔG::SMatrix{N,N,T}
-    K::MMatrix{N,N,T}
-    function PhaseEnergies(G::AbstractVector, Ea::AbstractMatrix)
+struct PhaseEnergies
+    G::AbstractVector
+    Ea::AbstractMatrix
+    barriers::AbstractMatrix
+    function PhaseEnergies(G::AbstractVector, forward_Ea::AbstractMatrix)
         n = length(G)
-        T = eltype(G)
-        @assert size(Ea) == (n, n)
-        ΔG = [G[j] - G[i] for j in 1:n, i in 1:n]
-        Ea_plus_ΔG = [i == j ? 0 : (ΔG[i, j] > 0 ? ΔG[i, j] + Ea[i, j] : Ea[i, j])
+        @assert size(forward_Ea) == (n, n)
+        deltaG = ΔG(G)
+        barriers = [i == j ? 0 : (deltaG[i, j] > 0 ? deltaG[i, j] + forward_Ea[i, j] : forward_Ea[i, j])
                 for j in 1:n, i in 1:n]
-        new{n,T}(SVector{n,T}(G), SMatrix{n,n,T}(Ea), SMatrix{n,n,T}(ΔG), SMatrix{n,n,T}(Ea_plus_ΔG), MMatrix{n,n,T}(zeros(n,n)))
+        new(G, forward_Ea, Matrix{eltype(G)}(barriers))
     end
 end
 
 n_phases(pe::PhaseEnergies) = length(pe.G)
+ΔG(gmat::AbstractVector) = [gmat[j] - gmat[i] for j in eachindex(gmat), i in eachindex(gmat)]
+ΔG(pe::PhaseEnergies) = ΔG(pe.G)
