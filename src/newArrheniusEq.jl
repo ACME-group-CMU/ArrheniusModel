@@ -36,13 +36,13 @@ Output:
     return vcat(zeros(effecting_nums-1), fcoeff) #Add 0s for reverse
 end
 
-arrhenius_rate(pe::PhaseEnergies{N,F}, T=300) where {N,F} = MMatrix{N,N,F}(arrhenius_rate(pe.barriers, T))
+arrhenius_rate(pe::PhaseEnergies, T=300) = arrhenius_rate(Array(pe.barriers), T)
 
 # move calculation to helper fcn to make AD easier
 function arrhenius_rate(barriers, T=300)
     kb = 8.617e-5 #eV/K
     A = 1.0 # Arrhenius prefactor
-    K = Array(A * exp.(-barriers ./ (kb * T)))
+    K = A * exp.(-barriers ./ (kb * T))
     # Adjust the diagonal elements
     for i in axes(K,1)
         K[i, i] =  -1 * sum(K[i, [1:i-1; i+1:end]])
