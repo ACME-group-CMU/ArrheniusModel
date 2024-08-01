@@ -36,7 +36,7 @@ Output:
     return vcat(zeros(effecting_nums-1), fcoeff) #Add 0s for reverse
 end
 
-arrhenius_rate(pe::PhaseEnergies, T=300) = arrhenius_rate(Array(pe.barriers), T)
+arrhenius_rate(pe::PhaseEnergies, T::Real=300) = arrhenius_rate(Array(pe.barriers), T)
 
 # move calculation to helper fcn to make AD easier
 function arrhenius_rate(barriers, T=300)
@@ -49,3 +49,12 @@ function arrhenius_rate(barriers, T=300)
     end
     return K
 end
+
+# mutating version for reverse-mode AD to work
+function arrhenius_rate!(barriers::Matrix, K::Matrix, T=300)
+    @assert size(K) == size(barriers) "Matrix for rates is of wrong dimension!"
+    K = arrhenius_rate(barriers, T)
+    return nothing
+end
+
+arrhenius_rate!(pe::PhaseEnergies, K::Matrix, T=300) = arrhenius_rate!(pe.barriers, K, T)

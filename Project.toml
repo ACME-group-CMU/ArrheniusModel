@@ -4,6 +4,7 @@ authors = ["Po-Sen Tseng <posent@andrew.cmu.edu>", "Rachel Kurchin <rkurchin@cmu
 version = "0.1.0"
 
 [deps]
+ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
