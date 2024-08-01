@@ -35,12 +35,12 @@ db = Array(zero(pe.barriers))
 K = zero(pe.barriers)
 dK = copy(K)
 dK[1,2] = 1.0
-Enzyme.autodiff(Reverse, ArrheniusModel.arrhenius_rate!, Duplicated(pe.barriers, db), Duplicated(K, dK))
+Enzyme.autodiff(Reverse, arrhenius_rate!, Duplicated(pe.barriers, db), Duplicated(K, dK))
 # okay, this still doesn't work as I think it should, I've asked on the Julia Slack for some help...
 
 # simpler M(n)WE...
 function f!(inmat, outmat)
-    outmat = inmat .^ 2
+    outmat .= inmat .^ 2
     return nothing
 end
 
