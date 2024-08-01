@@ -9,11 +9,11 @@ end
 
 function deposition_rates!(dc, c, p, t)
     # Unpack parameters
-    fcoeff, pe, j0, j, dt, num_steps, num_layers = p
+    fcoeff, K, j0, j, dt, num_steps, num_layers = p
     # Calculate deposition rates
     j = floor(Int, t / 0.5) + 1
     f = reverse(fcoeff[j: num_layers+j-1])
-    dc .= c .* f * pe.K
+    dc .= c .* f * K
     if j != j0
         c[j+1, 1] = 1.0
         j = j0
@@ -25,10 +25,10 @@ function simulate_deposition(fcoeff, pe::PhaseEnergies, T, num_steps, num_layers
     n = n_phases(pe)
     c0 = zeros(num_layers, n)
     c0[1, 1] = 1.0
-    arrhenius_rate(pe, T)
+    K = arrhenius_rate(pe, T)
     j = 0
     j0 = 0
-    p = (fcoeff, pe, j0, j, dt, num_steps, num_layers)
+    p = (fcoeff, K, j0, j, dt, num_steps, num_layers)
     tspan = (0.0, (num_steps-1) * dt)
     prob = ODEProblem(deposition_rates!, c0, tspan, p)
     sol = solve(prob, Euler(), saveat = 0.5, dt = dt)

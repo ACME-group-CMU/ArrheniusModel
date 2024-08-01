@@ -36,12 +36,13 @@ Output:
     return vcat(zeros(effecting_nums-1), fcoeff) #Add 0s for reverse
 end
 
-function arrhenius_rate(pe::PhaseEnergies, T=300)
+function arrhenius_rate(pe::PhaseEnergies{N,F}, T=300) where {N,F}
     kb = 8.617e-5 #eV/K
     A = 1.0 # Arrhenius prefactor
-    pe.K = A * exp.(-pe.Ea_plus_ΔG ./ (kb * T))
+    K = MMatrix{N,N,F}(A * exp.(-pe.Ea_plus_ΔG ./ (kb * T)))
     # Adjust the diagonal elements
-    for i in 1:size(pe.K, 1)
-        pe.K[i, i] =  -1 * sum(pe.K[i, [1:i-1; i+1:end]])
+    for i in 1:size(K, 1)
+        K[i, i] =  -1 * sum(K[i, [1:i-1; i+1:end]])
     end
+    return K
 end

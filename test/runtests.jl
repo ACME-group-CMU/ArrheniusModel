@@ -59,8 +59,9 @@ using Test
         @test all(layers .>= 0)
         @test all(layers[end,:] .== [1.0, 0.0, 0.0])
         @test all(layers[:, 1] .== 1.0)
-        for i in 1:size(pe.K,1)
-            @test pe.K[i, i] ==  -1 * sum(pe.K[i, [1:i-1; i+1:end]])
+        K = arrhenius_rate(pe, T)
+        for i in axes(K,1)
+            @test K[i, i] ==  -1 * sum(K[i, [1:i-1; i+1:end]])
         end
     end
     @testset "this will not fail" begin
