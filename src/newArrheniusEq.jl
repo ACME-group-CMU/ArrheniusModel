@@ -53,7 +53,7 @@ end
 # mutating version for reverse-mode AD to work
 function arrhenius_rate!(barriers::Matrix, K::Matrix, T=300)
     @assert size(K) == size(barriers) "Matrix for rates is of wrong dimension!"
-    K = arrhenius_rate(barriers, T)
+    K .= arrhenius_rate(barriers, T)
     return nothing
 end
 
