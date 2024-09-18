@@ -1,4 +1,5 @@
 using SciMLSensitivity, OrdinaryDiffEq, Enzyme
+using ArrheniusModel
 """
 1. I don't know why i have to assign a value to du to obtain the gradient, what does the du mean?
 2. The gradient from AD is the square value according to the FD method, why?
@@ -25,7 +26,7 @@ function last(u0, p, prob)
     u0 .= solve(prob, Tsit5(), u0 = u0, p = p, saveat = 0.1)[end]
     return nothing
 end
-display(last(u0, p, prob))
+#display(last(u0, p, prob))
 du = zeros(size(u0))
 dp = zeros(size(p))
 du[1]=1.0
@@ -59,3 +60,25 @@ u0 = [1.0]
 # Compute the numerical gradient
 numerical_grad = finite_difference_gradient(last2, u0, p, prob)
 println("Numerical Gradient: ", numerical_grad)
+
+
+"""
+#The diagonal value is missing in Reverse mode, why? Also, dT doesn't have any effect on the result in this form
+"""
+# example from tests
+G = [1.0,0.0]
+Ea = [0. 0.2; 0.2 0.]
+pe = PhaseEnergies(G, Ea)
+#Forward method
+db = Array(zero(pe.barriers))
+db[1,2] = 1.0
+g12 = Enzyme.autodiff(Forward, arrhenius_rate, Duplicated(pe.barriers, db))[1]
+println(g12)
+#Reverse method
+db = zero(pe.barriers)
+dT = 1.0
+T = 300.0
+K = zero(pe.barriers)
+dK = one(pe.barriers)
+Enzyme.autodiff(ReverseWithPrimal, arrhenius_rate!, Duplicated(pe.barriers, db), Duplicated(K, dK), Duplicated(T, dT))
+println(db) #The diagonal value is missing, why? Also, dT doesn't have any effect on the result
