@@ -2,8 +2,6 @@ using SciMLSensitivity, OrdinaryDiffEq, Enzyme
 using ArrheniusModel
 """
 1. I don't know why i have to assign a value to du to obtain the gradient, what does the du mean?
-2. The gradient from AD is the square value compared to the FD method, why? 7.389054210155433 vs 2.7182806083825284
-    ↑(Weirdly, the .jl file runs okay while the notebook doesn't)
 Symbolic method for this case:
 du/dt = u*p
 u^-1 du = p dt
@@ -64,7 +62,7 @@ println("Numerical Gradient: ", numerical_grad)
 
 
 """
-#The diagonal value is missing in Reverse mode, why? Also, dT doesn't have any effect on the result in this form
+2. The diagonal value is missing in Reverse mode, why? Also, dT doesn't have any effect on the result in this form
 """
 # example from tests
 G = [1.0,0.0]
