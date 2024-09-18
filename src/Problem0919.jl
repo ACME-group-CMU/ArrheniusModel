@@ -59,7 +59,6 @@ dp = zeros(size(p))
 val = [0.0]
 dval = zeros(size(val))
 dval[1] = 1.0
-Enzyme.autodiff(Reverse, last4, Duplicated(u0, du), Duplicated(p, dp), Const(prob), Duplicated(val, dval))
 # okay, I think this is now correct? But the question is still, what exactly was wrong before?
 # that is, why does overwriting u0 in that way cause the gradient to square? Mysterious scope things?
 
@@ -67,6 +66,7 @@ Enzyme.autodiff(Reverse, last4, Duplicated(u0, du), Duplicated(p, dp), Const(pro
 function last2(u0, p, prob) #returning the last value directly
     return solve(prob, Tsit5(), u0 = u0, p = p, saveat = 0.1)[end]
 end
+Enzyme.autodiff(Reverse, last4, Duplicated(u0, du), Duplicated(p, dp), Const(prob), Duplicated(val, dval))
 
 function finite_difference_gradient(f, u0, p, prob, epsilon=1e-6)
     grad = zeros(length(p))
@@ -104,9 +104,37 @@ g12 = Enzyme.autodiff(Forward, arrhenius_rate, Duplicated(pe.barriers, db))[1]
 println(g12)
 #Reverse method
 db = zero(pe.barriers)
-dT = 1.0
+dT = 0.0
 T = 300.0
 K = zero(pe.barriers)
 dK = one(pe.barriers)
+# dK[1,2] = 1.0
+dK[1,1] = 1.0
 Enzyme.autodiff(ReverseWithPrimal, arrhenius_rate!, Duplicated(pe.barriers, db), Duplicated(K, dK), Duplicated(T, dT))
 println(db) #The diagonal value is missing, why? Also, dT doesn't have any effect on the result
+
+# first, a version that takes in a matrix and returns one of the same size
+function dummy_ar2!(b,T,val)
+    val .= [arrhenius_rate(b, T[1])[1,1]]
+    return nothing
+end
+T = [300.0]
+dT = [0.0]
+db = zero(pe.barriers)
+val = [0.0]
+dval = [1.0]
+Enzyme.autodiff(ReverseWithPrimal, dummy_ar2!, Duplicated(pe.barriers, db), Duplicated(T, dT), Duplicated(val,dval))
+
+# now let's have it return the full matrix...
+ar_matrixT!(b,K,T) = arrhenius_rate!(b, K, T[1])
+T = [300.0]
+dT = [0.0]
+# b = [0.0 1.0; 1.2 0.0]
+b = [0 0.5; 0.5 0]
+db = zero(b)
+K = zero(b)
+dK = zero(b)
+dK[1,2] = 1.0
+# dK[2,1] = 1.0
+Enzyme.autodiff(ReverseWithPrimal, ar_matrixT!, Duplicated(b, db), Duplicated(K,dK), Duplicated(T,dT))
+# so we don't have to change the actual package functions, just whenever we want T-sensitivity, we have to make sure to pass it into Enzyme as a 1 x 1 matrix
