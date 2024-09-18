@@ -2,7 +2,8 @@ using SciMLSensitivity, OrdinaryDiffEq, Enzyme
 using ArrheniusModel
 """
 1. I don't know why i have to assign a value to du to obtain the gradient, what does the du mean?
-2. The gradient from AD is the square value according to the FD method, why?
+2. The gradient from AD is the square value compared to the FD method, why? 7.389054210155433 vs 2.7182806083825284
+    ↑(Weirdly, the .jl file runs okay while the notebook doesn't)
 Symbolic method for this case:
 du/dt = u*p
 u^-1 du = p dt
@@ -32,7 +33,7 @@ dp = zeros(size(p))
 du[1]=1.0
 #println(sol)
 gloss = Enzyme.autodiff(Reverse, last, Duplicated(u0, du), Duplicated(p, dp), Const(prob))
-println(dp)
+println("Automatic gradient", dp)
 
 
 #Finite_difference to verify
