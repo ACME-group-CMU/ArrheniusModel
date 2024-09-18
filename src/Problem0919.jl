@@ -33,6 +33,35 @@ du[1]=1.0
 gloss = Enzyme.autodiff(Reverse, last, Duplicated(u0, du), Duplicated(p, dp), Const(prob))
 println("Automatic gradient", dp)
 
+# another attempt, let's make it single vector input/scalar output for simplicity...
+function last3(u0, p, prob)
+    solve(prob, Tsit5(), u0 = [u0], p = [p], saveat = 0.1)[end][1]
+end
+
+# first, what about the convenience function?
+gradient(Reverse, x -> last3(x[1],x[2],prob), [1.0, 1.0])
+# okay, so this seems to work? How about the other way...
+
+u0 = 1.0
+p = 1.0
+Enzyme.autodiff(Reverse, last3, Active(u0), Active(p), Const(prob))
+# also good...okay, interesting...
+
+# here's a thought...
+function last4(u0, p, prob, val)
+    val .= solve(prob, Tsit5(), u0 = u0, p = p, saveat = 0.1)[end]
+    return nothing
+end
+p = [1.0]
+u0 = [1.0]
+du = zeros(size(u0))
+dp = zeros(size(p))
+val = [0.0]
+dval = zeros(size(val))
+dval[1] = 1.0
+Enzyme.autodiff(Reverse, last4, Duplicated(u0, du), Duplicated(p, dp), Const(prob), Duplicated(val, dval))
+# okay, I think this is now correct? But the question is still, what exactly was wrong before?
+# that is, why does overwriting u0 in that way cause the gradient to square? Mysterious scope things?
 
 #Finite_difference to verify
 function last2(u0, p, prob) #returning the last value directly
