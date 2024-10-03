@@ -58,3 +58,4 @@ function arrhenius_rate!(barriers::Matrix, K::Matrix, T=300)
 end
 
 arrhenius_rate!(pe::PhaseEnergies, K::Matrix, T=300) = arrhenius_rate!(pe.barriers, K, T)
+ar_matrixT!(b,K,T) = arrhenius_rate!(b, K, T[1])
