@@ -40,6 +40,7 @@ function sens_simulation(flow_rate, T, pe, para_sim)
             df = [0.0]  # Reinitialize df
             dT = [0.0]  # Reinitialize dT
             db = zero(b)  # Reinitialize db
+            ds[i,j] = 1.0
             Enzyme.autodiff(ReverseWithPrimal, simulate_deposition!, Duplicated(s, ds), Duplicated(f_, df), Duplicated(T_, dT), Duplicated(b, db), Const(para_sim))
             sens_f[i, j] = copy(df)  # Store the entire df vector
             sens_T[i, j] = copy(dT)  # Store the entire dT vector

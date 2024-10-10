@@ -3,6 +3,7 @@ using Statistics
 using DifferentialEquations
 using Plots
 using Printf
+using Enzyme
 gr()
 pe = PhaseEnergies(ArrheniusModel.G_values, ArrheniusModel.Ea_constants)
 display(pe.barriers)
