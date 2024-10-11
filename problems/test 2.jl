@@ -28,7 +28,8 @@ function fiip(dc, c, p, t)
     When I use dc .= c .*f * K, it gives me activity error
     Constant memory is stored (or returned) to a differentiable variable.
     """
-    dc .= c * K .*f
+    # dc .= c * K .*f
+    dc .= c .*f * K
     if j != j0
         c[j+1, 1] = 1.0
         j = j0
