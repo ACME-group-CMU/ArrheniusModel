@@ -66,20 +66,24 @@ using Test
             T = 300.0
             kb = 8.617e-5 #eV/K
             A = 1.0 # Arrhenius prefactor
-            G = [-5.92, -5.942, -5.97]
-            Ea = [0.00 1.00 0.01; 1.00 0.00 1.00; 0.01 1.00 0.00]
+            G = [-5.10, -5.97, -5.85]
+            Ea = [0.00 1.0 0.36; 1.0 0.00 0.38; 0.36 0.38 0.00]
             pe = PhaseEnergies(G, Ea)
             #K = A * exp.(-pe.barriers ./ (kb * T))
-            display(pe.barriers)
+            #display(pe.barriers)
             #display(K)
             K = arrhenius_rate(pe.barriers, T)
-            display(K)
+            #display(K)
             sens_b, sens_T = sens_arrhenius_rate(pe.barriers, T)
+            display(sens_b)
+            display(sens_T)
             n = n_phases(pe)
             @test size(sens_b) == (n, n)
             @test size(sens_T) == (n, n)
             sym_sens_T12 = A * exp(-pe.barriers[1,2] / (kb * T)) * (pe.barriers[1,2] / (kb * (T^2)))
             sym_sens_b12 = -A * exp(-pe.barriers[1,2] / (kb * T)) / (kb * T)
+            display(sym_sens_T12)
+            display(sym_sens_b12)
             @test sens_T[1,2][1] ≈ sym_sens_T12
             #display([sens_T[1,2][1], sym_sens_T12])
             sym_sens_b13 = -A * exp(-pe.barriers[1,3] / (kb * T)) / (kb * T)
