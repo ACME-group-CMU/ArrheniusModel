@@ -24,7 +24,7 @@ function simulate_deposition(flow_rate, T, barriers::Matrix, para_sim, decay_con
     num_steps, num_layers, dt = para_sim
     # Initialize existing_layers as a 2D array
     decay_coefficients = decay_constant * flow_rate
-    fcoeff = flow_coefficient.("exponential", num_layers, decay_coefficients)
+    fcoeff = flow_coefficient("exponential", num_layers, decay_coefficients)
     n = size(barriers, 1)
     c0 = zeros(num_layers, n)
     c0[1, 1] = 1.0
