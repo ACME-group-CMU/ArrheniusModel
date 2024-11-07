@@ -36,12 +36,26 @@ Output:
     return vcat(zeros(effecting_nums-1), fcoeff) #Add 0s for reverse
 end
 
-function arrhenius_rate(pe::PhaseEnergies, T=300)
+arrhenius_rate(pe::PhaseEnergies, T::Real=300) = arrhenius_rate(Array(pe.barriers), T)
+
+# move calculation to helper fcn to make AD easier
+function arrhenius_rate(barriers, T=300)
     kb = 8.617e-5 #eV/K
     A = 1.0 # Arrhenius prefactor
-    pe.K = A * exp.(-pe.Ea_plus_ΔG ./ (kb * T))
+    K = A * exp.(-barriers ./ (kb * T))
     # Adjust the diagonal elements
-    for i in 1:size(pe.K, 1)
-        pe.K[i, i] =  -1 * sum(pe.K[i, [1:i-1; i+1:end]])
+    for i in axes(K,1)
+        K[i, i] =  -1 * sum(K[i, [1:i-1; i+1:end]])
     end
+    return K
 end
+
+# mutating version for reverse-mode AD to work
+function arrhenius_rate!(barriers::Matrix, K::Matrix, T=300)
+    @assert size(K) == size(barriers) "Matrix for rates is of wrong dimension!"
+    K .= arrhenius_rate(barriers, T)
+    return nothing
+end
+
+arrhenius_rate!(pe::PhaseEnergies, K::Matrix, T=300) = arrhenius_rate!(pe.barriers, K, T)
+ar_matrixT!(b,K,T) = arrhenius_rate!(b, K, T[1])
