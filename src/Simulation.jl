@@ -9,7 +9,13 @@ end
 
 function deposition_rates!(dc, c, p, t)
     # Unpack parameters
-    fcoeff, K, j0, j, dt, num_steps, num_layers = p
+    fcoeff = p.fcoeff
+    K = p.K
+    j0 = p.j0
+    j = p.j
+    dt = p.dt
+    num_steps = p.num_steps
+    num_layers = p.num_layers
     # Calculate deposition rates
     j = floor(Int, t / 0.5) + 1
     f = reverse(fcoeff[j: num_layers+j-1])
