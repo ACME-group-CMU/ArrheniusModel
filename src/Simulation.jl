@@ -32,6 +32,8 @@ function simulate_deposition(flow_rate, T, barriers::Matrix, para_sim, decay_con
     j = 0
     j0 = 0
     p = (fcoeff, K, j0, j, dt, num_steps, num_layers)
+    p = NamedTuple{(:fcoeff, :K, :j0, :j, :dt, :num_steps, :num_layers)}(p)
+    p = ComponentArray(p)
     tspan = (0.0, (num_steps-1) * dt)
     prob = ODEProblem(deposition_rates!, c0, tspan, p)
     if final_step

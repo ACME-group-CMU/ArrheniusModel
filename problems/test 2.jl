@@ -47,8 +47,8 @@ prob = ODEProblem(fiip, c0, tspan, p)
 last(u0, p, prob) = solve(prob, Euler(), u0 = u0, p = p, saveat = 0.1, dt=0.1)[end]
 display(last(c0, p, prob))
 
-function last!(u0, p, prob)
-    u0 .= last(u0, p, prob)
+function last!(c0, p, prob)
+    c0 .= last(c0, p, prob)
     return nothing
 end
 """
