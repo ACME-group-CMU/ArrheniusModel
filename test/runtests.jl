@@ -20,8 +20,8 @@ using Test
             T = 300.0
             t= 10
             dt = 0.1
-            num_steps = Int(floor(Int, t/dt))
-            num_layers = Int(floor(Int, t/0.5))+1
+            num_steps = floor(Int, t/dt)
+            num_layers = floor(Int, t/0.5)+1
             para_sim = num_steps, num_layers, dt
             flow_rate = 0.5
             layers = simulate_deposition(flow_rate, T, pe.barriers, para_sim)
@@ -43,8 +43,8 @@ using Test
         T = 1.0
         t= 10
         dt = 0.1
-        num_steps = Int(floor(Int, t/dt))
-        num_layers = Int(floor(Int, t/0.5))+1
+        num_steps = floor(Int, t/dt)
+        num_layers = floor(Int, t/0.5)+1
         para_sim = num_steps, num_layers, dt
         flow_rate = 0.5
         decay_coefficient = 0.00001 * flow_rate

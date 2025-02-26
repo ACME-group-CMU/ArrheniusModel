@@ -14,8 +14,8 @@ function deposition_rates!(dc, c, p, t)
     j0 = p.j0
     j = p.j
     dt = p.dt
-    num_steps = p.num_steps
-    num_layers = p.num_layers
+    num_steps = Int(p.num_steps)
+    num_layers = Int(p.num_layers)
     # Calculate deposition rates
     j = floor(Int, t / 0.5) + 1
     f = reverse(fcoeff[j: num_layers+j-1])
