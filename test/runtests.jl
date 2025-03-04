@@ -22,9 +22,9 @@ using Test
             dt = 0.1
             num_steps = floor(Int, t/dt)
             num_layers = floor(Int, t/0.5)+1
-            para_sim = num_steps, num_layers, dt
+            timespan = (0.0, t)
             flow_rate = 0.5
-            layers = simulate_deposition(flow_rate, T, pe.barriers, para_sim)
+            layers = simulate_deposition(flow_rate, T, pe.barriers, timespan)
             @test all(sum(layers, dims=2) .≈ 1.0) #Conservation rule
             @test layers[:, 2] ≈ layers[:, 3]  # =somehow doesn't work even it shows the same value
             @test size(layers) == (num_layers, 3) # num_steps+1 to num_steps due to format change
@@ -45,11 +45,11 @@ using Test
         dt = 0.1
         num_steps = floor(Int, t/dt)
         num_layers = floor(Int, t/0.5)+1
-        para_sim = num_steps, num_layers, dt
+        timespan = (0.0, t)
         flow_rate = 0.5
         decay_coefficient = 0.00001 * flow_rate
         #fcoeff = flow_coefficient("exponential", num_layers, decay_coefficient)
-        layers = simulate_deposition(flow_rate, T, pe.barriers, para_sim)
+        layers = simulate_deposition(flow_rate, T, pe.barriers, timespan)
         @test all(sum(layers, dims=2) .≈ 1.0)
         @test layers[:, 2] != layers[:, 3]
         @test size(layers) == (num_layers, 3)
