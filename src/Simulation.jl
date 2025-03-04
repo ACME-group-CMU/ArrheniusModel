@@ -8,51 +8,36 @@ To build the meshgrids for the x and y values (Temperature and Flow Rate)
 end
 
 function deposition_rates!(dc, c, p, t)
-    # Unpack parameters
-    fcoeff = p.fcoeff
-    K = p.K
-    j0 = p.j0
-    j = p.j
-    dt = p.dt
-    num_steps = Int(p.num_steps)
-    num_layers = Int(p.num_layers)
-    # Calculate deposition rates
     j = floor(Int, t / 0.5) + 1
-    f = reverse(fcoeff[j: num_layers+j-1])
+    f = p.fcoeff[j: num_layers+j-1]
     dc .= c .* f * K
-    if j != j0
-        c[j+1, 1] = 1.0
-        j = j0
-    end
 end
 
-function simulate_deposition(flow_rate, T, barriers::Matrix, para_sim, decay_constant = 0.00001, final_step=true)
-    num_steps, num_layers, dt = para_sim
-    # Initialize existing_layers as a 2D array
+function simulate_deposition(flow_rate, T, barriers::Matrix, timespan, decay_constant = 0.00001, final_step=true)
     decay_coefficients = decay_constant * flow_rate
     fcoeff = flow_coefficient("exponential", num_layers, decay_coefficients)
     n = size(barriers, 1)
     c0 = zeros(num_layers, n)
-    c0[1, 1] = 1.0
+    for i in 1:num_layers
+        c0[i, 1] = 1.0
+    end
     K = arrhenius_rate(barriers, T)
     j = 0
-    j0 = 0
-    p = (fcoeff, K, j0, j, dt, num_steps, num_layers)
-    p = NamedTuple{(:fcoeff, :K, :j0, :j, :dt, :num_steps, :num_layers)}(p)
+    p = (fcoeff, K, num_steps, num_layers, j)
+    p = NamedTuple{(:fcoeff, :K, :num_steps, :num_layers, :j)}(p)
     p = ComponentArray(p)
-    tspan = (0.0, (num_steps-1) * dt)
-    prob = ODEProblem(deposition_rates!, c0, tspan, p)
+    prob = ODEProblem(deposition_rates!, c0, timespan, p)
     if final_step
-        sol = solve(prob, Euler(), save_everystep = false, dt = dt)
-        return sol.u[end]
+        sol = solve(prob, Euler(), save_everystep = false, dt = 0.1)
+        return Array(sol.u[end])
     else
         sol = solve(prob, Euler(), saveat = 0.5, dt = dt)
-        return sol.u
+        return Array(sol.u)
     end
 end
 
-function simulate_deposition!(sol::Matrix, flow_rate::Vector, T::Vector, barriers::Matrix, para_sim)
-    sol .= simulate_deposition(flow_rate, T, barriers, para_sim)
+function simulate_deposition!(sol::Matrix, flow_rate::Vector, T::Vector, barriers::Matrix, timespan)
+    sol .= simulate_deposition(flow_rate, T, barriers, timespan)
     return nothing
 end
 
