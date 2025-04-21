@@ -13,7 +13,8 @@ function deposition_rates!(dc, c, p, t)
     dc .= c .* f * K
 end
 
-function simulate_deposition(flow_rate, T, barriers::Matrix, timespan, decay_constant = 0.00001, final_step=true)
+function simulate_deposition(flow_rate, T, barriers::Matrix, para_sim, decay_constant = 0.00001, final_step=true)
+    num_steps, num_layers, timespan, dt = para_sim
     decay_coefficients = decay_constant * flow_rate
     fcoeff = flow_coefficient("exponential", num_layers, decay_coefficients)
     n = size(barriers, 1)
@@ -23,8 +24,8 @@ function simulate_deposition(flow_rate, T, barriers::Matrix, timespan, decay_con
     end
     K = arrhenius_rate(barriers, T)
     j = 0
-    p = (fcoeff, K, num_steps, num_layers, j)
-    p = NamedTuple{(:fcoeff, :K, :num_steps, :num_layers, :j)}(p)
+    p = (fcoeff, K)
+    p = NamedTuple{(:fcoeff, :K)}(p)
     p = ComponentArray(p)
     prob = ODEProblem(deposition_rates!, c0, timespan, p)
     if final_step
@@ -36,8 +37,8 @@ function simulate_deposition(flow_rate, T, barriers::Matrix, timespan, decay_con
     end
 end
 
-function simulate_deposition!(sol::Matrix, flow_rate::Vector, T::Vector, barriers::Matrix, timespan)
-    sol .= simulate_deposition(flow_rate, T, barriers, timespan)
+function simulate_deposition!(sol::Matrix, flow_rate::Vector, T::Vector, barriers::Matrix, para_sim)
+    sol .= simulate_deposition(flow_rate, T, barriers, para_sim)
     return nothing
 end
 
