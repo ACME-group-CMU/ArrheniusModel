@@ -3,6 +3,9 @@ module ArrheniusModel
 using Statistics
 using LinearAlgebra
 using DifferentialEquations
+using ComponentArrays
+#using SciMLSensitivity
+#using SciMLStructures
 
 include("EnergyStruct.jl")
 include("newArrheniusEq.jl")
